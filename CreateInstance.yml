@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: This file creates simple instance
+
+Resources:
+  InstanceCreate:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0327f51db613d7bd2
+      KeyName: mumbai-key
+      Tags:
+        - Key: Name
+          Value: InstanceCreate
+
+Outputs:
+  InstanceId:
+    Description: Instance id of the ec2 created
+    Value: !Ref InstanceCreate
