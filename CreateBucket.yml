@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: This file creates simple s3 bucket
+
+Resources:
+  BucketCreate:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: code-unique-bucket
+
+Outputs:
+  S3BucketName:
+    Description: Bucket created successfully
+    Value: !Ref BucketCreate
+
+  S3BucketUrl:
+    Description: Bucket website URL
+    Value: !GetAtt BucketCreate.WebsiteURL
