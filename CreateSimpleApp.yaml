@@ -19,7 +19,7 @@ Resources:
     Properties:
       VpcId: !Ref SimpleVPC
       CidrBlock: "10.0.1.0/24"
-      AvailabilityZone: ap-south-1b
+      AvailabilityZone: us-east-1a
       MapPublicIpOnLaunch: "true" # Public IP on instance launch
       Tags:
         - Key: "Name"
