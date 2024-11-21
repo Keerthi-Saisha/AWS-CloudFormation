@@ -57,13 +57,13 @@ Resources:
   DemoSg:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow ssh access to instance
+      GroupDescription: Allow http access to instance
       GroupName: DemoSg
       SecurityGroupIngress:
-        - CidrIp: 10.0.1.0/24
-        - IpProtocol: tcp
-          FromPort: '22'
-          ToPort: '22'
+        CidrIp: 0.0.0.0/0
+        IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
       Tags:
         - Key: Name
           Value: DemoSg
