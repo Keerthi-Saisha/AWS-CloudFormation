@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create an EC2 instance in a public subnet and install Apache HTTP Server.
+
+Resources:
+  # VPC Creation
+  SimpleVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+      EnableDnsSupport: "true"
+      EnableDnsHostnames: "true"
+      Tags:
+        - Key: "Name"
+          Value: "SimpleVPC"
+
+  # Public Subnet Creation
+  SimplePubSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref SimpleVPC
+      CidrBlock: "10.0.1.0/24"
+      AvailabilityZone: ap-south-1b
+      MapPublicIpOnLaunch: "true" # Public IP on instance launch
+      Tags:
+        - Key: "Name"
+          Value: "SimplePubSubnet"
+
+  # Internet Gateway Creation (to allow internet access)
+  SimpleIgw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: "Name"
+          Value: "SimpleIgw"
+
+  # Attach Internet Gateway to VPC
+  SimpleIgwAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref SimpleVPC
+      InternetGatewayId: !Ref SimpleIgw
+
+  # Route Table Creation
+  SimplePubRT:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref SimpleVPC
+      Tags:
+        - Key: "Name"
+          Value: "SimplePubRT"
+
+  # Default Route to IGW
+  SimplePubRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref SimplePubRT
+      DestinationCidrBlock: "0.0.0.0/0" # Route all traffic to the IGW
+      GatewayId: !Ref SimpleIgw
+
+  # Associate Route Table with Public Subnet
+  SimpleRTAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SimplePubSubnet
+      RouteTableId: !Ref SimplePubRT
+
+  # Security Group Creation (allow SSH and HTTP)
+  SimpleSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Allow SSH and HTTP access"
+      VpcId: !Ref SimpleVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: "0.0.0.0/0" # Allow SSH from anywhere (Not recommended for production)
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0" # Allow HTTP from anywhere
+      Tags:
+        - Key: "Name"
+          Value: "SimpleSG"
+
+  # EC2 Instance Creation in Public Subnet
+  SimpleInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t1.micro # Choose instance type
+      ImageId: ami-0866a3c8686eaeeba # Replace with an AMI ID for your region
+      SubnetId: !Ref SimplePubSubnet
+      SecurityGroupIds:
+        - !Ref SimpleSG
+      KeyName: nv-key # Ensure you have a key pair created beforehand
+      UserData: !Base64 |
+        #!/bin/bash
+        yum update -y
+        yum install -y httpd
+        # Start Apache service
+        systemctl start httpd
+        systemctl enable httpd
+        # Create an index.html file to test Apache
+        echo "<html><body><h1>Apache server installed!</h1></body></html>" > /var/www/html/index.html
+      Tags:
+        - Key: "Name"
+          Value: "SimpleInstance"
+
+Outputs:
+  InstanceId:
+    Description: "Instance ID"
+    Value: !Ref SimpleInstance
+
+  PublicIP:
+    Description: "Public IP of the EC2 Instance"
+    Value: !GetAtt SimpleInstance.PublicIp
+
+  VPCId:
+    Description: "VPC ID"
+    Value: !Ref SimpleVPC
+
+  PublicSubnetId:
+    Description: "Public Subnet ID"
+    Value: !Ref SimplePubSubnet
