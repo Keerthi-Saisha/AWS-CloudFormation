@@ -1,0 +1,5 @@
+{
+    "ipynb.experimental.serialization": true,
+    "git.alwaysShowStagedChangesResourceGroup": true,
+    "aws.accessAnalyzer.policyChecks.cloudFormationParameterFilePath": "true"
+}

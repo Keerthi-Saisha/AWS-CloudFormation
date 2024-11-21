@@ -17,7 +17,7 @@ Resources:
   DemoPsubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: String # Region
+      AvailabilityZone: ap-south-1a # Region
       CidrBlock: 10.0.1.0/24
       MapPublicIpOnLaunch: 'false' # no public access
       Tags:
