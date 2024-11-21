@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This file created instance with vpc and sg
+
+Resources:
+  # vpc creation
+  DemoVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: 'false'
+      EnableDnsSupport: 'false'
+
+      Tags:
+        - Key: Name
+          Value: DemoVpc
+  # private subnet creation
+  DemoPsubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: String # Region
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: 'false' # no public access
+      Tags:
+        - Key: Name
+          Value: DemoPsubnet
+      VpcId: !Ref DemoVpc
+
+  # security group creation
+  DemoSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ssh access to instance
+      GroupName: DemoSg
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+      Tags:
+        - Key: Name
+          Value: DemoSg
+      VpcId: !Ref DemoVpc
+
+  # instance creation
+  DemoEc2:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: ap-south-1a # region
+      ImageId: ami-0aebec83a182ea7ea # ami id of required server
+      InstanceType: t2.nano # Size of instance
+      KeyName: mumbai-key
+      SubnetId: !Ref DemoPsubnet
+      SecurityGroupIds:
+        - !Ref DemoSg
+      Tags:
+        - Key: Name
+          Value: DemoEc2
+
+# display ids of resource created
+Outputs:
+  InstanceId:
+    Description: Instance id of the linux ec2 created
+    Value: !Ref DemoEc2
+
+  SubnetId:
+    Description: Subnet id of the private subnet created
+    Value: !Ref DemoPsubnet
+
+  VPCId:
+    Description: VPC id of the vpc attached to linux ec2
+    Value: !Ref DemoVpc
