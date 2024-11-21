@@ -7,8 +7,8 @@ Resources:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
-      EnableDnsHostnames: 'false'
-      EnableDnsSupport: 'false'
+      EnableDnsHostnames: "false"
+      EnableDnsSupport: "false"
 
       Tags:
         - Key: Name
@@ -20,7 +20,7 @@ Resources:
     Properties:
       AvailabilityZone: ap-south-1a # Region
       CidrBlock: 10.0.1.0/24
-      MapPublicIpOnLaunch: 'true' # access to internet
+      MapPublicIpOnLaunch: "true" # access to internet
       Tags:
         - Key: Name
           Value: DemoPubsubnet
@@ -32,7 +32,7 @@ Resources:
     Properties:
       AvailabilityZone: ap-south-1a # Region
       CidrBlock: 10.0.2.0/24
-      MapPublicIpOnLaunch: 'false' # no public access
+      MapPublicIpOnLaunch: "false" # no public access
       Tags:
         - Key: Name
           Value: DemoPrisubnet
@@ -60,10 +60,10 @@ Resources:
       GroupDescription: Allow http access to instance
       GroupName: DemoSg
       SecurityGroupIngress:
-        CidrIp: 0.0.0.0/0
-        IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
+        - CidrIp: 10.0.1.0/24
+        - IpProtocol: tcp
+          FromPort: "22"
+          ToPort: "22"
       Tags:
         - Key: Name
           Value: DemoSg
