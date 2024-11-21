@@ -32,7 +32,7 @@ Resources:
       GroupDescription: Allow ssh access to instance
       GroupName: DemoSg
       SecurityGroupIngress:
-        - CidrIp: 0.0.0.0/0
+        - CidrIp: 10.0.1.0/24
         - IpProtocol: tcp
           FromPort: '22'
           ToPort: '22'
