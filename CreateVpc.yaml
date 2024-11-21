@@ -13,16 +13,44 @@ Resources:
       Tags:
         - Key: Name
           Value: DemoVpc
-  # private subnet creation
-  DemoPsubnet:
+
+  # public subnet creation
+  DemoPubsubnet:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: ap-south-1a # Region
       CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: 'true' # access to internet
+      Tags:
+        - Key: Name
+          Value: DemoPubsubnet
+      VpcId: !Ref DemoVpc
+
+  # private subnet creation
+  DemoPrisubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: ap-south-1a # Region
+      CidrBlock: 10.0.2.0/24
       MapPublicIpOnLaunch: 'false' # no public access
       Tags:
         - Key: Name
-          Value: DemoPsubnet
+          Value: DemoPrisubnet
+      VpcId: !Ref DemoVpc
+
+  # internet gateway creation
+  DemoIgw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: DemoIgw
+
+  # attach igw to vpc
+  DemoIgwAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref DemoIgw
       VpcId: !Ref DemoVpc
 
   # security group creation
@@ -49,7 +77,7 @@ Resources:
       ImageId: ami-0aebec83a182ea7ea # ami id of required server
       InstanceType: t2.nano # Size of instance
       KeyName: mumbai-key
-      SubnetId: !Ref DemoPsubnet
+      SubnetId: !Ref DemoPubsubnet
       SecurityGroupIds:
         - !Ref DemoSg
       Tags:
@@ -62,9 +90,9 @@ Outputs:
     Description: Instance id of the linux ec2 created
     Value: !Ref DemoEc2
 
-  SubnetId:
-    Description: Subnet id of the private subnet created
-    Value: !Ref DemoPsubnet
+  PublicIp:
+    Description: Public ip of the instance created
+    Value: !GetAtt DemoEc2.PublicIp
 
   VPCId:
     Description: VPC id of the vpc attached to linux ec2
